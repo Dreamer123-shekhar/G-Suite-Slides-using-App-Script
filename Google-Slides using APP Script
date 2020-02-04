@@ -1,0 +1,233 @@
+/*Author: Shekhar Adhikari
+Google-Suite: App-Script or Java Script 
+Event Based Programming
+
+This code will help us to generate custom slides when a user fills out the form.
+No matter how the user fill out the form the slides will look exactly the same*/
+function onFormSubmit(e) {
+
+    //DocumentApp.getActiveDocument()
+    //SlidesApp.getActivePresentation()
+    // FormApp.getActiveForm()
+
+    // DriveApp.Permission
+
+
+    Logger.log(e);
+
+    Logger.log(e.response);
+
+    Logger.log(JSON.stringify(e));
+
+    Logger.log(JSON.stringify(e.response));
+
+
+
+    var responses = e.response.getItemResponses();
+    var User = e.response.getRespondentEmail(); //Getting respondednt email it is has to be 'ON' setting in Google Form itself
+    var Name = responses[0].getResponse().toString();
+
+    //var Mob = responses[1].getResponse().toString();
+
+    var University = responses[2].getResponse().toString();
+
+    var Education = responses[3].getResponse().toString();
+
+    var Languages = responses[4].getResponse().toString();
+
+    var short_goals = responses[5].getResponse().toString();
+
+    var long_term_goals = responses[6].getResponse().toString();
+
+    var why_hire_shekhar = responses[7].getResponse().toString();
+
+    var ImageID = responses[8].getResponse();
+
+
+
+
+    var Image = DriveApp.getFileById(ImageID);
+
+    var imgBlob = Image.getBlob();
+
+
+
+
+    // var User = Session.getActiveUser().getEmail();
+
+    /* This is how we set destination folder and give permission to user 
+
+
+var destFolder = DriveApp.getFolderById("idj"); 
+
+ copyFile = DriveApp.getFileById("id").makeCopy('New ID Card', destFolder)
+
+var presentationCopyId = copyFile.getId();
+
+var destFolder = DriveApp.getFolderById("id")
+
+  .setSharing(DriveApp.Access.DOMAIN, DriveApp.Permission.EDIT);
+
+ 
+
+  var file = DriveApp.getFileById("id");
+
+  file.setSharing(DriveApp.Access.DOMAIN, DriveApp.Permission.EDIT)*/
+
+
+
+    //var editors = file.getEditors();
+
+    //for (var i = 0; i < editors.length; i++) {
+
+    //Logger.log(editors[i].getEmail());
+
+    //}
+
+    copyFile = DriveApp.getFileById("1SFLIKDsvmoB9FEp2osoTtGUlbRXOPcXY9Wrt6K2icv0").makeCopy('New ID Card');
+
+    var presentationId = copyFile.getId();
+
+    Logger.log("Creating presentation copy, copy file id: " + copyFile.getId());
+
+
+    var newSlides = SlidesApp.openById(presentationId);
+
+    //Logger.log(Mob)
+
+    //Extracting the data from var Mob
+
+
+    //From below here were are gonna change the value of presentation template with the extracted value from Google Form Responses
+
+       var foundCC = false, foundCD = false, foundCF = false;
+
+ 
+
+  for (var i = 0; i < Mob.length; i++) {
+
+ 
+
+    if(Mob[i].toLowerCase().includes("cool"))
+
+    {
+
+      Logger.log("Found cool in element: " + i);
+
+      newSlides.replaceAllText ('{{CC}}', "CC", true);
+
+      foundCC = true;
+
+      break;
+
+     
+
+    } else {
+
+     
+
+     // Logger.log("Did not find country in element: " + i + ", item: " + Mob[i].toLowerCase());
+
+     //
+
+    }
+
+ 
+
+  }
+
+   
+
+  for (var i = 0; i < Mob.length; i++) {
+
+    if(Mob[i].toLowerCase().includes("distinct")) {
+
+          Logger.log("Found distinct in element: " + i);
+
+      newSlides.replaceAllText ('{{CD}}', "CD", true);
+
+      foundCD = true;
+
+      break;
+
+   
+
+    } else {
+
+    //Logger.log("Did not find division in element: " + i + ", item: " + Mob[i].toLowerCase());
+
+    //
+
+    }
+
+ 
+
+  }
+
+ 
+
+  for (var i = 0; i < Mob.length; i++) {
+
+   
+
+     if(Mob[i].toLowerCase().includes("functional")) {
+
+       Logger.log("Found functional in element: " + i);
+
+      newSlides.replaceAllText ('{{CF}}', "CF", true);
+
+       foundCF = true;
+
+       break;
+
+
+     } else {
+
+       //    Logger.log("Did not find function in element: " + i + ", item: " + Mob[i].toLowerCase());
+
+       //
+
+ 
+
+     }
+
+  }
+
+    newSlides.replaceAllText('{{YOUR_NAME}}', Name, true);
+
+    newSlides.replaceAllText('{{uni_t}}', University, true);
+
+    newSlides.replaceAllText('{{edu_cation}}', Education, true);
+    newSlides.replaceAllText('{{languages_t}}', Languages, true);
+
+    newSlides.replaceAllText('{{short_term}}', short_goals, true);
+
+    newSlides.replaceAllText('{{Long_term}}', long_term_goals, true);
+
+    newSlides.replaceAllText('{{why_hire}}', why_hire_shekhar, true);
+
+    var PageImages = newSlides.getSlides()[0].getImages();
+
+    PageImages[2].replace(imgBlob);
+
+
+    //var driveId = 'https://docs.google.com/presentation/d/'
+
+    // Sending email to the person who fills out this form
+
+
+
+    // var email = Session.getActiveUser().getEmail();
+
+    // Logger.log(email)
+
+
+
+
+     //This is how we send email to the person who fills out the form 
+      
+      MailApp.sendEmail(User, "ID Card For: " + Name, 'Dear ' + User.toString() + ',\n\nPlease find below is the link to the ID Card: \n' + driveId + presentationCopyId);
+
+     
+
+}
